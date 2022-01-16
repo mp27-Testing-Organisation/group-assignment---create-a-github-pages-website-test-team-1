@@ -19,6 +19,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - run: echo "$GITHUB_CONTEXT"
+
       # delete and recreate result dir
       - name: Reset results dir
         run: |
