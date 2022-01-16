@@ -80,6 +80,45 @@ jobs:
           echo "${{steps.activity1.outputs.branch}}"
           echo "${{steps.activity1.outputs.path}}"
 
+      # get repo team members
+      - uses: actions/github-script@v5
+        name: "Get Team Members"
+        id: team-members
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            let members = [];
+
+            try {
+              // get repo teams
+              const resTeams = await github.rest.repos.listTeams({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+              });
+              console.log(`List teams response: ${resTeams.status}`);
+
+              // make assumption assignment team will be first in list
+              const teamSlug = resTeams.data[0].slug;
+              console.log(`Team slug: ${teamSlug}`);
+
+              // get team members
+              const resMembers = await github.rest.teams.listMembersInOrg({
+                org: context.repo.owner,
+                team_slug: teamSlug,
+              });
+              console.log(`List members response: ${resMembers.status}`);
+
+              members = resMembers.data.map(item => { return item.login })
+              console.log(`Members: ${members}`);
+
+            }
+            catch(err) {
+              console.log(err);
+            }
+
+            return members;
+      - run: echo "${{steps.team-members.outputs.result}}"
+
       # run grading
       # add id to step so outputs can be referenced
       - uses: education/autograding@v1
