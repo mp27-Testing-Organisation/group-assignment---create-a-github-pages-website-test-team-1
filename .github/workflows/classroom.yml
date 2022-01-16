@@ -1,0 +1,77 @@
+name: GitHub Classroom Workflow
+
+on: 
+  push:
+    branches:
+    - '*'
+    - '!status'
+    - '!feedback'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  # job to run autograding
+  build:
+    name: Autograding
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v2
+
+      # test activity 1 - enable gh pages
+      - uses: actions/github-script@v5
+        name: "Check Activity 1"
+        id: activity1
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            let result = 'fail';
+            let pageURL = '';
+            let sourceBranch = '';
+            let sourcePath = '';
+
+            // get pages
+            try {
+              const res = await github.rest.repos.getPages({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+              });
+              console.log(`Get pages response: ${res.status}`);
+
+              if (res.status == '200') {
+                pageURL = res.data.html_url;
+                sourceBranch = res.data.source.branch;
+                sourcePath = res.data.source.path;
+                console.log(`Pages URL: ${pageURL}`);
+                console.log(`Source branch: ${sourceBranch}`);
+                console.log(`Source path  : ${sourcePath}`);
+
+                if (sourceBranch == 'main' && sourcePath == '/docs') {
+                  result = 'success';
+                }
+              }
+            }
+            catch(err) {
+              console.log(err);
+            }
+
+            core.setOutput('url', pageURL);
+            core.setOutput('branch', sourceBranch);
+            core.setOutput('path', sourcePath);
+            return result;
+          result-encoding: string
+
+      - name: Get page outputs
+        run: |
+          echo "${{steps.activity1.outputs.url}}"
+          echo "${{steps.activity1.outputs.branch}}"
+          echo "${{steps.activity1.outputs.path}}"
+
+      # run grading
+      # add id to step so outputs can be referenced
+      - uses: education/autograding@v1
+        name: "** Grading and Feedback **"
+        id: autograding
+        continue-on-error: true
+

@@ -1,0 +1,14 @@
+{
+    "tests": [
+      {
+        "name": "Activity 1 - Enable GH Pages",
+        "setup": "",
+        "run": "[ -e .github/results/activity1.txt ] && exit 0 || exit 1",
+        "input": "",
+        "output": "",
+        "comparison": "included",
+        "timeout": 10,
+        "points": 1
+      }
+    ]
+}
