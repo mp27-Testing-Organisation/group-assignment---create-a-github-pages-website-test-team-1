@@ -1,0 +1,217 @@
+name: GitHub Classroom Workflow
+
+on: 
+  push:
+    branches:
+    - '*'
+    - '!status'
+    - '!feedback'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  # job to run autograding
+  grade:
+    name: Autograding
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v2
+
+      # delete and recreate result dir
+      - name: Reset results dir
+        run: |
+          rm -rf .github/results
+          mkdir -p .github/results
+
+      # test activity 1 - enable gh pages
+      - uses: actions/github-script@v5
+        name: "Check Activity 1 - Enable GH Pages"
+        id: activity1
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            let result = 'fail';
+            let pageURL = '';
+            let sourceBranch = '';
+            let sourcePath = '';
+
+            // get pages
+            try {
+              const res = await github.rest.repos.getPages({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+              });
+              console.log(`Get pages response: ${res.status}`);
+
+              if (res.status == '200') {
+                console.log(`Found GitHub Pages site`)
+                pageURL = res.data.html_url;
+                sourceBranch = res.data.source.branch;
+                sourcePath = res.data.source.path;
+                console.log(`Pages URL: ${pageURL}`);
+                console.log(`Source branch: ${sourceBranch}`);
+                console.log(`Source path  : ${sourcePath}`);
+
+                if (sourceBranch == 'main' && sourcePath == '/docs') {
+                  // write result to file
+                  const fs = require('fs');
+                  fs.writeFile('.github/results/activity1.txt', 'pass', function (err) {
+                    if (err) return console.log(err);
+                  });
+                  result = 'success';
+                }
+              }
+            }
+            catch(err) {
+              console.log(err);
+            }
+
+            core.setOutput('url', pageURL);
+            core.setOutput('branch', sourceBranch);
+            core.setOutput('path', sourcePath);
+            return result;
+          result-encoding: string
+
+      - name: Get page outputs
+        run: |
+          echo "${{steps.activity1.outputs.url}}"
+          echo "${{steps.activity1.outputs.branch}}"
+          echo "${{steps.activity1.outputs.path}}"
+
+      # run grading
+      # add id to step so outputs can be referenced
+      - uses: education/autograding@v1
+        name: "** Grading and Feedback **"
+        id: autograding
+        continue-on-error: true
+
+    outputs:
+      grading-score: ${{ steps.autograding.outputs.Points }}
+      activity1-result: ${{ steps.activity1.outputs.result }}
+      activity1-url: ${{ steps.activity1.outputs.url }}
+
+  # job to get repo info: default branch, feedback pr number
+  repo-info:
+    name: Get Repo Info
+    runs-on: ubuntu-latest
+    steps:
+      # pause to wait for classroom bot to setup feedback PR
+      - if: ${{ github.actor == 'github-classroom[bot]' }}
+        run: sleep 30
+
+      # Default branch is usually 'main', but in case it isn't get default branch name
+      - name: Get default branch name
+        uses: actions/github-script@v5
+        id: default-branch-name
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            // get default branch
+            const repo = await github.rest.repos.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            console.log(`Get repo response - status: ${repo.status}`);
+            return repo.data.default_branch;
+          result-encoding: string
+      - run: echo "Default branch name - ${{ steps.default-branch-name.outputs.result }}"
+
+      # find PR if it exists
+      - name: Find PR number
+        uses: markpatterson27/find-pull-request-action@pre-pr-release
+        id: check-pr
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          title: Feedback
+          base: feedback
+          branch: ${{ steps.default-branch-name.outputs.result }}
+          state: all
+      - run: echo ${{ steps.check-pr.outputs.number }}
+
+      # re-open PR if closed
+      - name: Re-open PR
+        if: ${{ steps.check-pr.outputs.state == 'closed' }}
+        uses: actions/github-script@v5
+        env:
+            PR_NUMBER: ${{ steps.check-pr.outputs.number }}
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            await github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: process.env.PR_NUMBER,
+              state: 'open'
+            });
+
+    outputs:
+      default-branch-name: ${{ steps.default-branch-name.outputs.result }}
+      feedback-pr: ${{ steps.check-pr.outputs.number }}
+
+  # job to build activity status icons and update pages URL
+  update-activity-status:
+    name: Update Activity Statuses
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [grade, repo-info]
+    steps:
+      # need to checkout whole repo
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      # switch to main branch
+      - name: Switch to main branch
+        run: git checkout ${{ needs.repo-info.outputs.default-branch-name }}
+
+      # update pages URL
+      - name: update Pages URL
+        if: ${{ needs.grade.outputs.activity1-url != '' }}
+        run: |
+          replace="When enabled, your site will be available at: \`https:\/\/<org name>.github.io\/<repo name>\`"
+          with="Your site is available at: [${{ needs.grade.outputs.activity1-url }}](${{ needs.grade.outputs.activity1-url }})"
+          sed -i "s|^$replace|$with|g" README.md
+
+      # commit and push pages url if changed
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add README.md
+          git commit -m "Updated pages URL" || exit 0
+          git push origin ${{ needs.repo-info.outputs.default-branch-name }}
+
+      # switch to status branch
+      - run: git checkout status || git checkout -b status
+
+      # make dir for activity status icons
+      - name: make icons dir
+        run: mkdir -p .github/activity-icons
+
+      # make/copy activity 1 icon
+      - name: activity 1 icon
+        run: |
+          echo ${{ needs.grade.outputs.activity1-result }}
+          if ${{ needs.grade.outputs.activity1-result == 'success' }}; then
+            cp .github/templates/activity-completed.svg .github/activity-icons/activity1.svg
+          else
+            cp .github/templates/activity-incomplete.svg .github/activity-icons/activity1.svg
+          fi
+
+      # create points bar
+      - name: points bar
+        uses: markpatterson27/points-bar@v1
+        with:
+          points: ${{ needs.grade.outputs.grading-score }}
+          path: '.github/activity-icons/points-bar.svg'
+
+      # commit and push activity icons if statuses have changed
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add '.github/activity-icons'
+          git commit -m "Add/Update activity icons" || exit 0
+          git push origin status
