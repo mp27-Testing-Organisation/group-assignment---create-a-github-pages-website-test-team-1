@@ -20,6 +20,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - run: echo "$GITHUB_CONTEXT"
+        env: GITHUB_CONTEXT: ${{ toJSON(github) }}
 
       # delete and recreate result dir
       - name: Reset results dir
