@@ -1,0 +1,122 @@
+name: GitHub Classroom Workflow
+
+on: 
+  push:
+    branches:
+    - '*'
+    - '!status'
+    - '!feedback'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  # job to run autograding
+  build:
+    name: Autograding
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v2
+
+      # test activity 1 - enable gh pages
+      - uses: actions/github-script@v5
+        name: "Check Activity 1"
+        id: activity1
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            let result = 'fail';
+            let pageURL = '';
+            let sourceBranch = '';
+            let sourcePath = '';
+
+            // get pages
+            try {
+              const res = await github.rest.repos.getPages({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+              });
+              console.log(`Get pages response: ${res.status}`);
+
+              if (res.status == '200') {
+                console.log(`Found GitHub Pages site`)
+                pageURL = res.data.html_url;
+                sourceBranch = res.data.source.branch;
+                sourcePath = res.data.source.path;
+                console.log(`Pages URL: ${pageURL}`);
+                console.log(`Source branch: ${sourceBranch}`);
+                console.log(`Source path  : ${sourcePath}`);
+
+                if (sourceBranch == 'main' && sourcePath == '/docs') {
+                  // write result to file
+                  const fs = require('fs');
+                  fs.writeFile('.github/results/activity1.txt', 'pass', function (err) {
+                    if (err) return console.log(err);
+                  });
+                  result = 'success';
+                }
+              }
+            }
+            catch(err) {
+              console.log(err);
+            }
+
+            core.setOutput('url', pageURL);
+            core.setOutput('branch', sourceBranch);
+            core.setOutput('path', sourcePath);
+            return result;
+          result-encoding: string
+
+      - name: Get page outputs
+        run: |
+          echo "${{steps.activity1.outputs.url}}"
+          echo "${{steps.activity1.outputs.branch}}"
+          echo "${{steps.activity1.outputs.path}}"
+
+      # run grading
+      # add id to step so outputs can be referenced
+      - uses: education/autograding@v1
+        name: "** Grading and Feedback **"
+        id: autograding
+        continue-on-error: true
+
+    outputs:
+      grading-score: ${{ steps.autograder.outputs.Points }}
+      activity1-result: ${{ steps.activity1.outputs.result }}
+      activity1-url: ${{ steps.activity1.outputs.url }}
+
+# job to build activity status icons
+  build-activity-icons:
+    name: Build Activity Icons
+    runs-on: ubuntu-latest
+    if: always()
+    needs: build
+    steps:
+      # need to checkout whole repo
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set git config
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Switch to main branch
+        run: git checkout main
+
+      # update pages URL
+      - name: update Pages URL
+        if: ${{ needs.build.outputs.activity1-url != '' }}
+        run: |
+          replace="When enabled, your site will be available at: \`https:\/\/<org name>.github.io\/<repo name>\`"
+          with="Your site is available at: [${{ needs.build.outputs.activity1-url }}](${{ needs.build.outputs.activity1-url }})"
+          sed -i "s|^$replace|$with|g" README.md
+
+      # commit and push pages url if changed
+      - name: Commit changes
+        run: |
+          git add README.md
+          git commit -m "Updated pages URL" || exit 0
+          git push origin main
