@@ -119,6 +119,23 @@ jobs:
             return members;
       - run: echo "${{steps.team-members.outputs.result}}"
 
+      # try getting collaborators
+      - uses: actions/github-script@v5
+        name: "Get Team Collaborators"
+        id: team-collaborators
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            // get repo members
+            const res = await github.repos.listCollaborators({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            let collaborators = res.data;
+            console.log(collaborators);
+            return collaborators;
+      - run: echo "${{steps.team-collaborators.outputs.result}}"
+
       # run grading
       # add id to step so outputs can be referenced
       - uses: education/autograding@v1
