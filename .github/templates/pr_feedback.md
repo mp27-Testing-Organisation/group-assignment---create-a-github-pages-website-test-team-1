@@ -3,13 +3,13 @@ status-success: ':white_check_mark:'
 status-fail: ':x:'
 activity1-success: "Pages enabled. Your site is available at: [${pages-url}](${pages-url})"
 activity1-fail: |
-  Pages not enabled. Use the `main` branch and `/docs` folder for site contents.
+  Pages not enabled. Use the \`main\` branch and \`/docs\` folder for site contents.
   
-  When enabled, your site will be available at: `https://<org name>.github.io/<repo name>`
+  When enabled, your site will be available at: \`https://<org name>.github.io/<repo name>\`
 activity1-fail-2: |
-  Pages enabled, but configured for `${pages-branch}` and `${pages-path}` folder.
+  Pages enabled, but configured for \`${pages-branch}\` branch and \`${pages-path}\` folder.
 
-  Use the `main` branch and `/docs` folder for site contents.
+  Use the \`main\` branch and \`/docs\` folder for site contents.
 ---
 
 ## Auto-Feedback
