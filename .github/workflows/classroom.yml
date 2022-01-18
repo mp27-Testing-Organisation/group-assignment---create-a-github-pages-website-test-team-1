@@ -398,7 +398,7 @@ jobs:
       - name: list team members
         run: |
           members=""
-          for member in $(jq -r '.[]' <<< "${{ needs.grade.outputs.team-members }}"); do
+          for member in $(echo "${{ needs.grade.outputs.team-members }}" | jq -r '.[]'); do
             members="${members}- $member\n"
           done
           echo "team-members=$(/bin/bash .github/scripts/escape.sh "$members")" >> $GITHUB_ENV
