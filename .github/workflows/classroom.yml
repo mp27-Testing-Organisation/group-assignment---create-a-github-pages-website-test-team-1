@@ -202,9 +202,9 @@ jobs:
             return repo.data.default_branch;
           result-encoding: string
 
-      context repository {
-        "master_branch": "main",
-        }
+      # context repository {
+      #   "master_branch": "main",
+      #   }
 
       - run: echo "Default branch name - ${{ steps.default-branch-name.outputs.result }}"
 
