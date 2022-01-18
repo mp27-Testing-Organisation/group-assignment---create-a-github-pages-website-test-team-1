@@ -7,9 +7,9 @@ activity1-fail: |
   
   When enabled, your site will be available at: \`https://<org name>.github.io/<repo name>\`
 activity1-fail-2: |
-  Pages enabled, but configured for \`\${pages-branch}\` branch and \`\${pages-path}\` folder.
+  Pages enabled, but configured for \`\${pages-branch}\` branch and \`\${pages-path}\` folder. Use the \`main\` branch and \`/docs\` folder for site contents.
 
-  Use the \`main\` branch and \`/docs\` folder for site contents.
+  See [Configuring a publishing source for your GitHub Pages site](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site) for details on how to configure the correct publishing source.
 ---
 
 ## Auto-Feedback
