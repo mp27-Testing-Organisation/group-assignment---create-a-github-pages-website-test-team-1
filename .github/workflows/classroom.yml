@@ -424,7 +424,7 @@ jobs:
         uses: actions/github-script@v5
         env:
           MESSAGE: ${{ steps.prep.outputs.result }}
-          ISSUE: ${{ needs.grade.outputs.feedback-pr }}
+          ISSUE: ${{ needs.repo-info.outputs.feedback-pr }}
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
