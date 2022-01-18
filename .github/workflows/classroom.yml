@@ -126,14 +126,14 @@ jobs:
 
 
 
-      # test activity 2 - commits
-      - uses: actions/github-script@v5
-        name: "Check Activity 2"
-        id: activity2
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            pass
+      # # test activity 2 - commits
+      # - uses: actions/github-script@v5
+      #   name: "Check Activity 2"
+      #   id: activity2
+      #   with:
+      #     github-token: ${{secrets.GITHUB_TOKEN}}
+      #     script: |
+      #       pass
         # foreach member
         #   filter commits author
         #     filter commits new file
