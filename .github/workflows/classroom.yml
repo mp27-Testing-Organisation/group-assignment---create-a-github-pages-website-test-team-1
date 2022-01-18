@@ -404,7 +404,7 @@ jobs:
           members=""
           for member in "${teamMembers[@]:1}"; do
             name=$(curl -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/users/$member | jq 'select(.name != null)')
-            members="${members}- ${name} [$member](https://github.com/$member)${\n}"
+            members="${members}- ${name} [$member](https://github.com/$member)$'\n'"
           done
           # members="$(printf -- "- %s\n" "${teamMembers[@]:1}")"
           echo "team-members=$(/bin/bash .github/scripts/escape.sh "$members")" >> $GITHUB_ENV
