@@ -404,7 +404,7 @@ jobs:
           members=""
           newline=$'\n'
           for member in "${teamMembers[@]:1}"; do
-            name=$(curl -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/users/$member | jq 'select(.name != null) | .name')
+            name=$(curl -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/users/$member | jq -r 'select(.name != null) | .name')
             members="${members}- ${name} [$member](https://github.com/$member)$newline"
           done
           # members="$(printf -- "- %s\n" "${teamMembers[@]:1}")"
