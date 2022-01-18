@@ -380,7 +380,7 @@ jobs:
       # activity 1 feedback
       - name: activity 1 feedback
         run: |
-          if ${{ needs.build.outputs.activity1-result == 'success' }}; then
+          if ${{ needs.grade.outputs.activity1-result == 'success' }}; then
             message="${{ steps.mto.outputs.activity1-success }}"
             status="${{ steps.mto.outputs.status-success }}"
           else
