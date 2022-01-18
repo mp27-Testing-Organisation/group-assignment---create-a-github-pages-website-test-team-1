@@ -235,6 +235,15 @@ jobs:
           with="Your site is available at: [${{ needs.grade.outputs.activity1-url }}](${{ needs.grade.outputs.activity1-url }})"
           sed -i "s|^$replace|$with|g" README.md
 
+      # un-update pages URL if gh pages disabled after enabling
+      - name: un-update Pages URL
+        if: ${{ needs.grade.outputs.activity1-url == '' }}
+        run: |
+          IFS='/' read -ra repoArray <<< "${{ github.repository }}"
+          replace="Your site is available at: [https:\/\/${repoArray[0]}.github.io\/${repoArray[1]}](https:\/\/${repoArray[0]}.github.io\/${repoArray[1]}\/)"
+          with="When enabled, your site will be available at: \`https:\/\/<org name>.github.io\/<repo name>\`"
+          sed -i "s|^$replace|$with|g" README.md
+
       # commit and push pages url if changed
       - name: Commit changes
         run: |
