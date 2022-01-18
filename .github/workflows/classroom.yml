@@ -404,7 +404,7 @@ jobs:
           members="$(printf -- "- %s\n" "${teamMembers[@]:1}")"
           echo "team-members=$(/bin/bash .github/scripts/escape.sh "$members")" >> $GITHUB_ENV
 
-          curl -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/users/${teamMembers[1]}
+          curl -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/users/${teamMembers[2]} | jq '.name'
 
       # replace tokens
       # read template file and replace tokens. token replacement based on env name.
