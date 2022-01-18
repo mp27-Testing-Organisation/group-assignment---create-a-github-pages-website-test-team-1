@@ -122,6 +122,19 @@ jobs:
             return members;
       - run: echo "${{steps.team-members.outputs.result}}"
 
+      - uses: actions/github-script@v5
+        name: "Check Activity 2"
+        id: activity2
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const res = await github.rest.repos.listContributors({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            console.log(res)
+
+
 
 
 
