@@ -242,7 +242,7 @@ jobs:
         if: ${{ needs.grade.outputs.activity1-url == '' }}
         run: |
           IFS='/' read -ra repoArray <<< "$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')"
-          replace="Your site is available at: \[https:\/\/${repoArray[0]}.github.io\/${repoArray[1]}\](https:\/\/${repoArray[0]}.github.io\/${repoArray[1]}\/)"
+          replace="Your site is available at: \[https:\/\/${repoArray[0]}.github.io\/${repoArray[1]}\/\](https:\/\/${repoArray[0]}.github.io\/${repoArray[1]}\/)"
           echo $replace
           with="When enabled, your site will be available at: \`https:\/\/<org name>.github.io\/<repo name>\`"
           sed -i "s|^$replace|$with|g" README.md
