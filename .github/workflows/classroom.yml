@@ -176,6 +176,7 @@ jobs:
       pages-url: ${{ steps.activity1.outputs.url }}
       pages-branch: ${{steps.activity1.outputs.branch}}
       pages-path: ${{steps.activity1.outputs.path}}
+      team-members: ${{steps.team-members.outputs.result}}
 
   # job to get repo info: default branch, feedback pr number
   repo-info:
