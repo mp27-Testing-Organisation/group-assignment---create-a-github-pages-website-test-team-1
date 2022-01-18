@@ -6,7 +6,7 @@ on:
     - '*'
     - '!status'
     - '!feedback'
-  
+
   deployment:
 
   # Allows you to run this workflow manually from the Actions tab
@@ -20,10 +20,6 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v2
-
-      - run: echo "$GITHUB_CONTEXT"
-        env:
-          GITHUB_CONTEXT: ${{ toJSON(github) }}
 
       # delete and recreate result dir
       - name: Reset results dir
@@ -87,6 +83,7 @@ jobs:
           echo "${{steps.activity1.outputs.path}}"
 
       # get repo team members
+      # need a PAT scoped to read:org to get team list and team members
       - uses: actions/github-script@v5
         name: "Get Team Members"
         id: team-members
@@ -125,23 +122,46 @@ jobs:
             return members;
       - run: echo "${{steps.team-members.outputs.result}}"
 
-      # try getting collaborators
+
+
+
+
+      # test activity 2 - commits
       - uses: actions/github-script@v5
-        name: "Get Team Collaborators"
-        id: team-collaborators
+        name: "Check Activity 2"
+        id: activity2
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            // get repo members
-            const res = await github.rest.repos.listCollaborators({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-            });
-            console.log(res);
-            let collaborators = res.data;
-            console.log(collaborators);
-            return collaborators;
-      - run: echo "${{steps.team-collaborators.outputs.result}}"
+            pass
+        # foreach member
+        #   filter commits author
+        #     filter commits new file
+        # output
+        # - list members not make commit
+
+
+      # test activity 3 - open PR
+        # output
+        # - list members not open PR
+
+
+      # test activity 4 - comment on PR
+      # get all PR
+      # foreach member
+      #   filter out PR author
+      #    get all PR comments
+        # output
+        # - list members not commented on PR
+
+
+      # test activity 5 - merge commit
+      # get all merge commits
+      # filter members not author of merge
+        # output
+        # - list members not make merge commit
+
+      
 
       # run grading
       # add id to step so outputs can be referenced
@@ -153,7 +173,9 @@ jobs:
     outputs:
       grading-score: ${{ steps.autograding.outputs.Points }}
       activity1-result: ${{ steps.activity1.outputs.result }}
-      activity1-url: ${{ steps.activity1.outputs.url }}
+      pages-url: ${{ steps.activity1.outputs.url }}
+      pages-branch: ${{steps.activity1.outputs.branch}}
+      pages-path: ${{steps.activity1.outputs.path}}
 
   # job to get repo info: default branch, feedback pr number
   repo-info:
@@ -179,6 +201,11 @@ jobs:
             console.log(`Get repo response - status: ${repo.status}`);
             return repo.data.default_branch;
           result-encoding: string
+
+      context repository {
+        "master_branch": "main",
+        }
+
       - run: echo "Default branch name - ${{ steps.default-branch-name.outputs.result }}"
 
       # find PR if it exists
@@ -231,19 +258,18 @@ jobs:
 
       # update pages URL
       - name: update Pages URL
-        if: ${{ needs.grade.outputs.activity1-url != '' }}
+        if: ${{ needs.grade.outputs.pages-url != '' }}
         run: |
           replace="When enabled, your site will be available at: \`https:\/\/<org name>.github.io\/<repo name>\`"
-          with="Your site is available at: [${{ needs.grade.outputs.activity1-url }}](${{ needs.grade.outputs.activity1-url }})"
+          with="Your site is available at: [${{ needs.grade.outputs.pages-url }}](${{ needs.grade.outputs.pages-url }})"
           sed -i "s|^$replace|$with|g" README.md
 
       # un-update pages URL if gh pages disabled after enabling
       - name: un-update Pages URL
-        if: ${{ needs.grade.outputs.activity1-url == '' }}
+        if: ${{ needs.grade.outputs.pages-url == '' }}
         run: |
           IFS='/' read -ra repoArray <<< "$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')"
           replace="Your site is available at: \[https:\/\/${repoArray[0]}.github.io\/${repoArray[1]}\/\](https:\/\/${repoArray[0]}.github.io\/${repoArray[1]}\/)"
-          echo $replace
           with="When enabled, your site will be available at: \`https:\/\/<org name>.github.io\/<repo name>\`"
           sed -i "s|^$replace|$with|g" README.md
 
@@ -272,6 +298,46 @@ jobs:
           else
             cp .github/templates/activity-incomplete.svg .github/activity-icons/activity1.svg
           fi
+      
+      # make/copy activity 2 icon
+      - name: activity 2 icon
+        run: |
+          echo ${{ needs.grade.outputs.activity2-result }}
+          if ${{ needs.grade.outputs.activity2-result == 'success' }}; then
+            cp .github/templates/activity-completed.svg .github/activity-icons/activity2.svg
+          else
+            cp .github/templates/activity-incomplete.svg .github/activity-icons/activity2.svg
+          fi
+
+      # make/copy activity 3 icon
+      - name: activity 3 icon
+        run: |
+          echo ${{ needs.grade.outputs.activity3-result }}
+          if ${{ needs.grade.outputs.activity3-result == 'success' }}; then
+            cp .github/templates/activity-completed.svg .github/activity-icons/activity3.svg
+          else
+            cp .github/templates/activity-incomplete.svg .github/activity-icons/activity3.svg
+          fi
+
+      # make/copy activity 4 icon
+      - name: activity 4 icon
+        run: |
+          echo ${{ needs.grade.outputs.activity4-result }}
+          if ${{ needs.grade.outputs.activity4-result == 'success' }}; then
+            cp .github/templates/activity-completed.svg .github/activity-icons/activity4.svg
+          else
+            cp .github/templates/activity-incomplete.svg .github/activity-icons/activity4.svg
+          fi
+
+      # make/copy activity 5 icon
+      - name: activity 5 icon
+        run: |
+          echo ${{ needs.grade.outputs.activity5-result }}
+          if ${{ needs.grade.outputs.activity5-result == 'success' }}; then
+            cp .github/templates/activity-completed.svg .github/activity-icons/activity5.svg
+          else
+            cp .github/templates/activity-incomplete.svg .github/activity-icons/activity5.svg
+          fi
 
       # create points bar
       - name: points bar
@@ -288,3 +354,84 @@ jobs:
           git add '.github/activity-icons'
           git commit -m "Add/Update activity icons" || exit 0
           git push origin status
+
+  # job to post feedback message in Feedback PR
+  # Classroom will create the PR when assignment accepted. PR should be issue 1.
+  post-feedback:
+    name: Post Feedback Comment
+    runs-on: ubuntu-latest
+    # run even if autograding fails. only run on main branch and if pr exists.
+    if: ${{ always() && needs.repo-info.outputs.feedback-pr != '' && github.ref == 'refs/heads/main' && github.actor != 'github-classroom[bot]' }}
+    needs: [grade, repo-info]
+    steps:
+      # checkout files so can access template
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      # read template
+      - uses: markpatterson27/markdown-to-output@v1
+        id: mto
+        with:
+          filepath: .github/templates/pr_feedback.md
+
+      # set feedback var
+      # activity 1 feedback
+      - name: activity 1 feedback
+        run: |
+          if ${{ needs.build.outputs.activity1-result == 'success' }}; then
+            message="${{ steps.mto.outputs.activity1-success }}"
+            status="${{ steps.mto.outputs.status-success }}"
+          else
+            if ${{ needs.grade.outputs.pages-url != '' }}; then
+              message="${{ steps.mto.outputs.activity1-fail-2 }}"
+            else
+              message="${{ steps.mto.outputs.activity1-fail }}"
+            fi
+            status="${{ steps.mto.outputs.status-fail }}"
+          fi
+          echo "fb-activity1=$(/bin/bash .github/scripts/escape.sh "$message")" >> $GITHUB_ENV
+          echo "status-activity1=$(/bin/bash .github/scripts/escape.sh "$status")" >> $GITHUB_ENV
+
+      # replace tokens
+      # read template file and replace tokens. token replacement based on env name.
+      - name: prepare comment and substitute tokens
+        id: prep
+        uses: actions/github-script@v5
+        env:
+          pages-url: ${{ needs.grade.outputs.pages-url }}
+          pages-branch: ${{ needs.grade.outputs.pages-branch }}
+          pages-path: ${{ needs.grade.outputs.pages-path }}
+          points: ${{ needs.grade.outputs.grading-score }}
+          template: ${{ steps.mto.outputs.body }}
+        with:
+          script: |
+            const fs = require('fs')
+            let commentBody = process.env.template
+
+            for (envName in process.env) {
+              commentBody = commentBody.replace("${"+envName+"}", process.env[envName]
+                .replace(/%0D/g, '\r')
+                .replace(/%0A/g, '\n')
+                .replace(/%25/g, '\%'))
+            }
+
+            return commentBody
+          result-encoding: string
+
+     # post comment on feedback PR. issues and PRs have same numbers
+      - name: post comment
+        uses: actions/github-script@v5
+        env:
+          MESSAGE: ${{ steps.prep.outputs.result }}
+          ISSUE: ${{ needs.grade.outputs.feedback-pr }}
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const { MESSAGE, ISSUE } = process.env
+            await github.rest.issues.createComment({
+              issue_number: process.env.ISSUE,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `${MESSAGE}`
+            })
