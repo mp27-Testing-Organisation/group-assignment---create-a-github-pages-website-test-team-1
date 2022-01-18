@@ -392,6 +392,8 @@ jobs:
             status="${{ steps.mto.outputs.status-fail }}"
           fi
           echo "$message"
+          echo '$message'
+          echo `$message`
           echo "fb-activity1=$(/bin/bash .github/scripts/escape.sh "$message")" >> $GITHUB_ENV
           echo "status-activity1=$(/bin/bash .github/scripts/escape.sh "$status")" >> $GITHUB_ENV
 
