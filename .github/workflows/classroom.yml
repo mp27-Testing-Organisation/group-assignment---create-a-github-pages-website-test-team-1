@@ -128,7 +128,7 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            const res = await github.rest.repos.listContributors({
+            const res = await github.rest.repos.listCollaborators({
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
