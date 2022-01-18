@@ -397,8 +397,10 @@ jobs:
       # list team members
       - name: list team members
         run: |
-          IFS=',][' read -ra teamMembers <<< "${{ needs.grade.outputs.team-members }}"
-          members=$(printf -- "- %s\n" "${teamMembers[@]}")
+          members=""
+          for member in $(jq '.[]' <<< "${{ needs.grade.outputs.team-members }}"); do
+            members="${members}- $member\n"
+          done
           echo "team-members=$(/bin/bash .github/scripts/escape.sh "$members")" >> $GITHUB_ENV
 
       # replace tokens
