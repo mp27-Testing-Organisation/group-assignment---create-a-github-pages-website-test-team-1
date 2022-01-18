@@ -7,7 +7,7 @@ on:
     - '!status'
     - '!feedback'
 
-  deployment:
+  # deployment:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -391,6 +391,7 @@ jobs:
             fi
             status="${{ steps.mto.outputs.status-fail }}"
           fi
+          echo "$message"
           echo "fb-activity1=$(/bin/bash .github/scripts/escape.sh "$message")" >> $GITHUB_ENV
           echo "status-activity1=$(/bin/bash .github/scripts/escape.sh "$status")" >> $GITHUB_ENV
 
