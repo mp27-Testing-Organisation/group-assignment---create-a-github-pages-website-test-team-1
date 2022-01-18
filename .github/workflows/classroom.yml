@@ -126,7 +126,7 @@ jobs:
         name: "Check Activity 2"
         id: activity2
         with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
+          github-token: ${{secrets.READORG}}
           script: |
             const res = await github.rest.repos.listCollaborators({
               owner: context.repo.owner,
