@@ -396,7 +396,7 @@ jobs:
       # list team members
       - name: list team members
         run: |
-          IFS=',][' read -ra teamMembers <<< "${{ needs.build.outputs.team-members }}"
+          IFS=',][' read -ra teamMembers <<< "${{ needs.grade.outputs.team-members }}"
           members=""
           for member in "${teamMembers[@]}"; do
             members="${members}- $member\n"
