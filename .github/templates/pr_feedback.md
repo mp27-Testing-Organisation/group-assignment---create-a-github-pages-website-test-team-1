@@ -1,7 +1,7 @@
 ---
 status-success: ':white_check_mark:'
 status-fail: ':x:'
-activity1-success: "Pages enabled. Your site is available at: [\"${pages-url}\"](\"${pages-url}\")"
+activity1-success: "Pages enabled. Your site is available at: [\"${pagesurl}\"](\"${pagesurl}\")"
 activity1-fail: |
   Pages not enabled. Use the \`main\` branch and \`/docs\` folder for site contents.
   

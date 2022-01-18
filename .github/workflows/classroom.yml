@@ -408,7 +408,7 @@ jobs:
         id: prep
         uses: actions/github-script@v5
         env:
-          pages-url: ${{ needs.grade.outputs.pages-url }}
+          pagesurl: ${{ needs.grade.outputs.pages-url }}
           pages-branch: ${{ needs.grade.outputs.pages-branch }}
           pages-path: ${{ needs.grade.outputs.pages-path }}
           points: ${{ needs.grade.outputs.grading-score }}
