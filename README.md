@@ -29,7 +29,7 @@ The site should have common navigation, header and footer on all pages. Consiste
 
 You will need to [enable GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site) for this repo. You are to use the `main` branch and `/docs` folder for site contents.
 
-Your site is available at: [https://markpatterson27.github.io/Group-Assignment-Create-A-GitHub-Pages-Website-dev/](https://markpatterson27.github.io/Group-Assignment-Create-A-GitHub-Pages-Website-dev/)
+When enabled, your site will be available at: `https://<org name>.github.io/<repo name>`
 
 ## Tasks
 
