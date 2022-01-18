@@ -393,6 +393,16 @@ jobs:
           echo "fb-activity1=$(/bin/bash .github/scripts/escape.sh "$message")" >> $GITHUB_ENV
           echo "status-activity1=$(/bin/bash .github/scripts/escape.sh "$status")" >> $GITHUB_ENV
 
+      # list team members
+      - name: list team members
+        run: |
+          IFS=',][' read -ra teamMembers <<< "${{ needs.build.outputs.team-members }}"
+          members=""
+          for member in "${teamMembers[@]}"; do
+            members="${members}- $member\n"
+          done
+          echo "team-members=$(/bin/bash .github/scripts/escape.sh "$members")" >> $GITHUB_ENV
+
       # replace tokens
       # read template file and replace tokens. token replacement based on env name.
       - name: prepare comment and substitute tokens

@@ -22,6 +22,8 @@ ${fb-activity1}
 
 ### Team Members
 
+${team-members}
+
 #### Contribution Stats
 
 Autograding Score: ${points}
