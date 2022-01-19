@@ -167,8 +167,7 @@ jobs:
 
             // loop through members
             for (const member of members) {
-              let commitSHAList = [];
-
+              let commitFound = false;
               // loop through branches
               for (const branch of branches) {
                 // get commits, filtered by actor and branch
@@ -180,14 +179,21 @@ jobs:
                   per_page: 100
                 });
                 console.log(`List commits for ${member} on ${branch} response: ${res.status}`);
-                commitSHAList = [
-                  ...commitSHAList,
-                  ...res.data.map(item => item.sha)
-                ];
-                console.log(commitSHAList);
+
+                const commitSHAs = res.data.map(item => item.sha);
+
+                if (commitSHAs.includes(additionSHAs)) {
+                  commitFound = true;
+                  break;
+                }
               }
-              if (! additionSHAs.some(v => commitSHAList.includes(v))) {
+
+              if (commitFound) {
+                console.log(`${member} has committed a file`);
+              }
+              else {
                 console.log("No addition commits found");
+                console.log(`${member} has not committed a file`);
                 noCommitMembers.push(member);
               }
             }
