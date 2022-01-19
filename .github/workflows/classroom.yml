@@ -253,6 +253,8 @@ jobs:
       pages-branch: ${{ steps.activity1.outputs.branch }}
       pages-path: ${{ steps.activity1.outputs.path }}
       team-members: ${{ steps.team-members.outputs.result }}
+      activity2-result: ${{ steps.activity2.outputs.result }}
+      no-commits: ${{ steps.activity2.outputs.no_commits }}
 
   # job to get repo info: default branch, feedback pr number
   repo-info:
@@ -472,6 +474,26 @@ jobs:
           echo ${message}
           echo "fb-activity1=$(/bin/bash .github/scripts/escape.sh "$message")" >> $GITHUB_ENV
           echo "status-activity1=$(/bin/bash .github/scripts/escape.sh "$status")" >> $GITHUB_ENV
+
+      # activity 2 feedback
+      - name: activity 2 feedback
+        run: |
+          if ${{ needs.grade.outputs.activity2-result == 'success' }}; then
+            message="${{ steps.mto.outputs.activity2-success }}"
+            status="${{ steps.mto.outputs.status-success }}"
+          else
+            message="${{ steps.mto.outputs.activity2-fail }}"
+            status="${{ steps.mto.outputs.status-fail }}"
+          fi
+          echo "fb-activity2=$(/bin/bash .github/scripts/escape.sh "$message")" >> $GITHUB_ENV
+          echo "status-activity2=$(/bin/bash .github/scripts/escape.sh "$status")" >> $GITHUB_ENV
+      
+      # generate formatted list of members who have not made a commit
+      - name: list no commit members
+        run: |
+          IFS=',][' read -ra teamMembers <<< "${{ needs.grade.outputs.no-commits }}"
+          members="$(printf -- "- %s\n" "${teamMembers[@]:1}")"
+          echo "no-commit-members=$(/bin/bash .github/scripts/escape.sh "$members")" >> $GITHUB_ENV
 
       # list team members
       - name: list team members

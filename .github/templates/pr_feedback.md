@@ -12,6 +12,45 @@ activity1-fail-2: |
   Pages enabled, but configured for \`\${pages-branch}\` branch and \`\${pages-path}\` folder. Use the \`main\` branch and \`/docs\` folder for site contents.
 
   (See [Configuring a publishing source for your GitHub Pages site](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site) for details on how to configure the correct publishing source.)
+activity2-success: Yay. Everyone in the team has added a file and made a commit.
+activity2-fail: |
+  Not everyone has made a commit. The following team members have not added a file and made a commit:
+  \\${no-commit-members}
+  
+  <details>
+    <summary>How to make a git commit</summary>
+    
+    **Clone** - [Clone](https://github.com/git-guides/git-clone) the repository to your local machine.
+
+    \`\`\`
+    git clone https://github.com/${GITHUB_REPOSITORY}.git
+    \`\`\`
+
+    **Edit** - Edit and save the files.
+
+    \`\`\`
+    cd ${REPO_NAME}
+    code editme.md
+    \`\`\`
+
+    **Add** - [Add](https://github.com/git-guides/git-add) the changes to staging.
+    
+    \`\`\`
+    git add editme.md
+    \`\`\`
+
+    **Commit** - [Commit](https://github.com/git-guides/git-commit) the changes to the git repo.
+
+    \`\`\`
+    git commit -m \"asked a question in editme.md\"
+    \`\`\`
+
+    **Push** - [Push](https://github.com/git-guides/git-push) the new commits back to the remote repository.
+
+    \`\`\`
+    git push origin main
+    \`\`\`
+  </details>
 ---
 
 ## Auto-Feedback
@@ -21,6 +60,10 @@ activity1-fail-2: |
 #### ${status-activity1} Activity 1 - Enable GitHub Pages
 
 ${fb-activity1}
+
+#### ${status-activity2} Activity 2 - Make Commit
+
+${fb-activity2}
 
 ### Team Members
 
