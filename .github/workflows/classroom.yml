@@ -376,6 +376,8 @@ jobs:
             let noMergeMembers = [];
             let result = 'fail';
 
+            console.log(mergeSHAs);
+
             if (mergeSHAs.length) {
 
             // loop through members
