@@ -183,7 +183,7 @@ jobs:
                 const commitSHAs = res.data.map(item => item.sha);
                 console.log(commitSHAs);
 
-                if (commitSHAs.includes(additionSHAs)) {
+                if (additionSHAs.some(v => commitSHAs.includes(v))) {
                   commitFound = true;
                   break;
                 }
