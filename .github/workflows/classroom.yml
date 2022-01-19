@@ -160,6 +160,8 @@ jobs:
             const additionSHAs = process.env.COMMIT_SHAS.split(" ");
             const branches = process.env.BRANCHES.split(" ");
 
+            console.log(additionSHAs);
+
             let noCommitMembers = [];
             let result = 'fail';
 
@@ -185,6 +187,7 @@ jobs:
                 console.log(commitSHAList);
               }
               if (! additionSHAs.some(v => commitSHAList.includes(v))) {
+                console.log("No addition commits found");
                 noCommitMembers.push(member);
               }
             }
@@ -212,19 +215,6 @@ jobs:
           echo "${{steps.activity2.outputs.no_commits}}"
 
 
-      # # test activity 2 - commits
-      # - uses: actions/github-script@v5
-      #   name: "Check Activity 2"
-      #   id: activity2
-      #   with:
-      #     github-token: ${{secrets.GITHUB_TOKEN}}
-      #     script: |
-      #       pass
-        # foreach member
-        #   filter commits author
-        #     filter commits new file
-        # output
-        # - list members not make commit
 
 
       # test activity 3 - open PR
