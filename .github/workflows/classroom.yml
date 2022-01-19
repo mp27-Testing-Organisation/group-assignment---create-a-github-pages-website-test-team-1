@@ -371,7 +371,7 @@ jobs:
       activity3-result: ${{ steps.activity3.outputs.result }}
       no-pr: ${{ steps.activity3.outputs.no_pr }}
       activity4-result: ${{ steps.activity4.outputs.result }}
-      no-comments: ${{ steps.activity3.outputs.no_comments }}
+      no-comments: ${{ steps.activity4.outputs.no_comments }}
 
   # job to get repo info: default branch, feedback pr number
   repo-info:
