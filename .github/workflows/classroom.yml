@@ -230,7 +230,7 @@ jobs:
             const res = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              state: all
+              state: 'all'
             });
             console.log(`List PR response: ${res.status}`);
 
