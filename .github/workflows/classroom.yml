@@ -850,4 +850,4 @@ jobs:
         run: git ls-files | xargs -n1 git blame --line-porcelain | sed -n 's/^author //p' | sort -f | uniq -ic | sort -nr
 
       - name: Commit count
-        run: git log --pretty='%an' | uniq -ic | sort -nr
+        run: git log --pretty='%an %ae' | uniq -ic | sort -nr
