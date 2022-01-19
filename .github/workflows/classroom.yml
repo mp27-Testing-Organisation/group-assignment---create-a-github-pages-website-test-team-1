@@ -275,6 +275,8 @@ jobs:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             const members = JSON.parse(process.env.MEMBERS);
+            let noCommentMembers = [];
+            let result = 'fail';
 
             const resAllPR = await github.rest.pulls.list({
               owner: context.repo.owner,
@@ -282,15 +284,61 @@ jobs:
               state: 'all'
             });
             console.log(`List PR response: ${resAllPR.status}`);
-            console.log(resAllPR.data);
 
-      # test activity 4 - comment on PR
-      # get all PR
-      # foreach member
-      #   filter out PR author
-      #    get all PR comments
-        # output
-        # - list members not commented on PR
+            for (const member of members) {
+              let commentFound = false;
+
+              const prIDs = resAllPR.data.map(item => {
+                //## if item.user.login != "github-classroom[bot]"
+                if (! ["github-classroom[bot]", member].includes(item.user.login)){
+                  return item;
+                }
+              });
+
+              for (id of prIDs) {
+                const resPRComments = await github.rest.issues.listComments({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: id,
+                  per_page: 100
+                });
+                console.log(`List PR ${id} comments response: ${resPRComments.status}`);
+
+                const commentAuthors = resPRComments.data.map(item => item.user.login);
+
+                if (commentAuthors.includes(member) {
+                  commentFound = true;
+                  break;
+                }
+              }
+
+              if (commentFound) {
+                console.log(`${member} has commented on another's PR`);
+              }
+              else {
+                console.log(`${member} has not commented on a PR`);
+                noCommentMembers.push(member);
+              }
+            }
+
+            // is noCommentMembers list non-zero
+            if (noCommentMembers.length) {
+              console.log("Members found with no comments");
+              result = 'fail';
+            }
+            else {
+              console.log("No members found who have not commented on PRs")
+
+              // write result to file
+              const fs = require('fs');
+              fs.writeFile('.github/results/activity4.txt', 'pass', function (err) {
+                if (err) return console.log(err);
+              });
+
+              result = 'success';
+            }
+            core.setOutput('no_comments', noCommentMembers);
+            return result
 
 
       # test activity 5 - merge commit
