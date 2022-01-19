@@ -122,21 +122,84 @@ jobs:
             return members;
       - run: echo "${{steps.team-members.outputs.result}}"
 
+      # get commit SHAs with additions
+      - name: Get addition commit SHAs
+        id: commit-shas
+        run: |
+          shas=$(git log --diff-filter=A --pretty='%H')
+          shas=${shas[@]}
+          echo "::set-output name=sha_list::$shas"
+
+      # get list of branches
+      - name: Get branch list
+        id: branch-list
+        run: |
+          branches=$(git for-each-ref --format='%(refname:short)' refs/heads/)
+          branches=${branches[@]//status/}
+          branches=${branches[@]//feedback/}
+          echo "::set-output name=branch_list::$branches"
+
+      # test activity 2 - commits
       - uses: actions/github-script@v5
         name: "Check Activity 2"
         id: activity2
+        env:
+          MEMBERS: ${{ steps.team-members.outputs.result }}
+          COMMIT_SHAS: ${{ steps.commit-shas.outputs.sha_list }}
+          BRANCHES: ${{ steps:branch-list.outputs.branch_list }}
         with:
-          github-token: ${{secrets.READORG}}
+          github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            const res = await github.rest.repos.listCollaborators({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-            });
-            console.log(res)
+            const members = JSON.parse(process.env.MEMBERS);
+            const additionSHAs = process.env.COMMIT_SHAS.split(" ");
+            const branches = process.env.BRANCHES.split(" ");
 
+            let noCommitMembers = [];
+            let result = 'fail';
 
+            // loop through members
+            for (const member of members) {
+              let commitSHAList = [];
 
+              // loop through branches
+              for (const branch of branches) {
+                // get commits, filtered by actor and branch
+                const res = await github.repos.listCommits({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  author: member,
+                  sha: branch,
+                  per_page: 100
+                });
+                console.log(`List commits for ${member} on ${branch} response: ${res.status}`);
+                commitSHAList = [
+                  ...commitSHAList,
+                  res.data.map(item => item.sha)
+                ];
+                console.log(commitSHAList);
+              }
+              if (! additionSHAs.some(v => commitSHAList.includes(v))) {
+                noCommitMembers.push(member);
+              }
+            }
 
+            // is noCommitMembers list non-zero
+            if (noCommitMembers.length) {
+              console.log("Members found with no commits");
+              result = 'fail';
+            else {
+              console.log("No members found who have made no commits")
+
+              // write result to file
+              const fs = require('fs');
+              fs.writeFile('.github/results/activity2.txt', 'pass', function (err) {
+                if (err) return console.log(err);
+              });
+
+              result = 'success';
+            }
+            core.setOutput('no_commits', noCommitMembers);
+            return result
 
 
       # # test activity 2 - commits
