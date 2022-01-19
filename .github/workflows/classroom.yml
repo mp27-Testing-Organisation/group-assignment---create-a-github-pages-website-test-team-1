@@ -681,7 +681,9 @@ jobs:
                 .replace(/%0A/g, '\n')
                 .replace(/%25/g, '\%'))
             }
-            for (envName in process.env) {
+            // additional env re-replace
+            activityMessageEnv = ["no-commit-members", "no-pr-members", "no-comment-members"]
+            for (envName in activityMessageEnv) {
               commentBody = commentBody.replace("${"+envName+"}", process.env[envName]
                 .replace(/%0D/g, '\r')
                 .replace(/%0A/g, '\n')
