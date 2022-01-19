@@ -55,6 +55,10 @@ activity3-success: Yay. Everyone in the team has opened a Pull Request.
 activity3-fail: |
   Not everyone has opened a Pull Request. The following team members have not opened a Pull Request:
   \${no-pr-members}
+activity4-success: Everyone in the team has commented on someone else's Pull Request.
+activity4-fail: |
+  Not everyone has reviewed another's Pull Request. The following team members have not reviewed a Pull Request:
+  \${no-comment-members}
 ---
 
 ## Auto-Feedback
@@ -72,6 +76,10 @@ ${fb-activity2}
 #### ${status-activity3} Activity 3 - Make Pull Request
 
 ${fb-activity3}
+
+#### ${status-activity4} Activity 4 - Review Pull Request
+
+${fb-activity4}
 
 ### Team Members
 
