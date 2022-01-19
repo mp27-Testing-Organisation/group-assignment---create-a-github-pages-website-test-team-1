@@ -207,6 +207,9 @@ jobs:
             }
             core.setOutput('no_commits', noCommitMembers);
             return result
+      - run: |
+          echo "${{steps.activity2.outputs.result}}"
+          echo "${{steps.activity2.outputs.no_commits}}"
 
 
       # # test activity 2 - commits
