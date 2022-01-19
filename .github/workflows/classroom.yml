@@ -284,6 +284,7 @@ jobs:
               state: 'all'
             });
             console.log(`List PR response: ${resAllPR.status}`);
+            console.log(resAllPR.data);
 
             for (const member of members) {
               let commentFound = false;
