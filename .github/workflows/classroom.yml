@@ -182,7 +182,7 @@ jobs:
                 console.log(`List commits for ${member} on ${branch} response: ${res.status}`);
                 commitSHAList = [
                   ...commitSHAList,
-                  res.data.map(item => item.sha)
+                  ...res.data.map(item => item.sha)
                 ];
                 console.log(commitSHAList);
               }
