@@ -265,13 +265,24 @@ jobs:
           echo "${{steps.activity3.outputs.result}}"
           echo "${{steps.activity3.outputs.no_pr}}"
 
+      # test activity 4 - comment on PR
+      - uses: actions/github-script@v5
+        name: "Check Activity 4"
+        id: activity4
+        env:
+          MEMBERS: ${{ steps.team-members.outputs.result }}
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const members = JSON.parse(process.env.MEMBERS);
 
-
-
-      # test activity 3 - open PR
-        # output
-        # - list members not open PR
-
+            const resAllPR = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'all'
+            });
+            console.log(`List PR response: ${resAllPR.status}`);
+            console.log(resAllPR.data);
 
       # test activity 4 - comment on PR
       # get all PR
