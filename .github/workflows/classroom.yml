@@ -214,6 +214,57 @@ jobs:
           echo "${{steps.activity2.outputs.result}}"
           echo "${{steps.activity2.outputs.no_commits}}"
 
+      # test activity 3 - open PR
+      - uses: actions/github-script@v5
+        name: "Check Activity 2"
+        id: activity2
+        env:
+          MEMBERS: ${{ steps.team-members.outputs.result }}
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const members = JSON.parse(process.env.MEMBERS);
+            let noPRMembers = [];
+            let result = 'fail';
+
+            const res = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: all
+            });
+            console.log(`List PR response: ${res.status}`);
+
+            prAuthors = res.data.map(item => item.user.login);
+
+            for (const member of members) {
+              if (! prAuthors.includes(member)) {
+                noPRMembers.push(member);
+              }
+            }
+
+            // is noPRMembers list non-zero
+            if (noPRMembers.length) {
+              console.log("Members found with no PRs");
+              result = 'fail';
+            }
+            else {
+              console.log("No members found who have not open a PR")
+
+              // write result to file
+              const fs = require('fs');
+              fs.writeFile('.github/results/activity3.txt', 'pass', function (err) {
+                if (err) return console.log(err);
+              });
+
+              result = 'success';
+            }
+            core.setOutput('no_pr', noPRMembers);
+            return result
+
+      - run: |
+          echo "${{steps.activity3.outputs.result}}"
+          echo "${{steps.activity3.outputs.no_pr}}"
+
 
 
 
@@ -255,6 +306,8 @@ jobs:
       team-members: ${{ steps.team-members.outputs.result }}
       activity2-result: ${{ steps.activity2.outputs.result }}
       no-commits: ${{ steps.activity2.outputs.no_commits }}
+      activity3-result: ${{ steps.activity3.outputs.result }}
+      no-pr: ${{ steps.activity3.outputs.no_pr }}
 
   # job to get repo info: default branch, feedback pr number
   repo-info:
