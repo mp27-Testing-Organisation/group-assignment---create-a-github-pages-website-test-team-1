@@ -148,7 +148,7 @@ jobs:
         env:
           MEMBERS: ${{ steps.team-members.outputs.result }}
           COMMIT_SHAS: ${{ steps.commit-shas.outputs.sha_list }}
-          BRANCHES: ${{ steps:branch-list.outputs.branch_list }}
+          BRANCHES: ${{ steps.branch-list.outputs.branch_list }}
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
