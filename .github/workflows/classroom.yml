@@ -841,5 +841,13 @@ jobs:
           npm install -g git-hours
           git-hours
 
+      - name: Git hours
+        uses: denstorti/git-hours-action@v1
+        id: githours
+      - run: echo -e '${{steps.githours.outputs.hours}}' 
+
       - name: Lines per contrib
         run: git ls-files | xargs -n1 git blame --line-porcelain | sed -n 's/^author //p' | sort -f | uniq -ic | sort -nr
+
+      - name: Commit count
+        run: git log --pretty='%an' | uniq -ic | sort -nr
