@@ -189,6 +189,7 @@ jobs:
             if (noCommitMembers.length) {
               console.log("Members found with no commits");
               result = 'fail';
+            }
             else {
               console.log("No members found who have made no commits")
 
