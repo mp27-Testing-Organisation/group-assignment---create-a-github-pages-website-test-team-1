@@ -289,11 +289,7 @@ jobs:
             for (const member of members) {
               let commentFound = false;
 
-              const prIDs = resAllPR.data.map(item => {
-                if (! ["github-classroom[bot]", member].includes(item.user.login)){
-                  return item.id;
-                }
-              });
+              const prIDs = resAllPR.data.filter(item => (! ["github-classroom[bot]", member].includes(item.user.login))).map(item => item.number);
 
               console.log(prIDs);
 
