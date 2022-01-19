@@ -823,3 +823,9 @@ jobs:
               repo: context.repo.repo,
               body: `${MESSAGE}`
             })
+
+      # try git-hours
+      - name: git hours
+        run: |
+          npm install -g git-hours
+          git-hours
