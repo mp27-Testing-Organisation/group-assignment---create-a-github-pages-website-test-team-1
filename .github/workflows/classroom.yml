@@ -376,6 +376,8 @@ jobs:
             let noMergeMembers = [];
             let result = 'fail';
 
+            if (mergeSHAs.length) {
+
             // loop through members
             for (const member of members) {
               let commitFound = false;
@@ -407,6 +409,11 @@ jobs:
                 console.log(`${member} has not committed a file`);
                 noMergeMembers.push(member);
               }
+            }
+
+            }
+            else {
+              noMergeMembers = members;
             }
 
             // is noMergeMembers list non-zero
