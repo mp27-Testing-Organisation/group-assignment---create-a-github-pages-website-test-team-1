@@ -600,6 +600,12 @@ jobs:
                 .replace(/%0A/g, '\n')
                 .replace(/%25/g, '\%'))
             }
+            for (envName in process.env) {
+              commentBody = commentBody.replace("${"+envName+"}", process.env[envName]
+                .replace(/%0D/g, '\r')
+                .replace(/%0A/g, '\n')
+                .replace(/%25/g, '\%'))
+            }
 
             return commentBody
           result-encoding: string
