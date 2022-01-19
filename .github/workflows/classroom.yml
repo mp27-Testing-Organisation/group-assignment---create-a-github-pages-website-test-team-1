@@ -378,7 +378,7 @@ jobs:
 
             console.log(mergeSHAs);
 
-            if (mergeSHAs.length) {
+            if (mergeSHAs.length && mergeSHAs[0].length) {
 
             // loop through members
             for (const member of members) {
