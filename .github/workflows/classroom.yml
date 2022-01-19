@@ -20,6 +20,8 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v2
+      with:
+          fetch-depth: 0
 
       # delete and recreate result dir
       - name: Reset results dir
