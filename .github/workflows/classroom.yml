@@ -840,3 +840,6 @@ jobs:
         run: |
           npm install -g git-hours
           git-hours
+
+      - name: Lines per contrib
+        run: git ls-files | xargs -n1 git blame --line-porcelain | sed -n 's/^author //p' | sort -f | uniq -ic | sort -nr
