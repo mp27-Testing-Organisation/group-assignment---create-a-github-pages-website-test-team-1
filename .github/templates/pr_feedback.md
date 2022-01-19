@@ -51,6 +51,10 @@ activity2-fail: |
     git push origin main
     \`\`\`
   </details>
+activity3-success: Yay. Everyone in the team has opened a Pull Request.
+activity3-fail: |
+  Not everyone has opened a Pull Request. The following team members have not opened a Pull Request:
+  \${no-pr-members}
 ---
 
 ## Auto-Feedback
@@ -64,6 +68,10 @@ ${fb-activity1}
 #### ${status-activity2} Activity 2 - Make Commit
 
 ${fb-activity2}
+
+#### ${status-activity3} Activity 3 - Make Pull Request
+
+${fb-activity3}
 
 ### Team Members
 

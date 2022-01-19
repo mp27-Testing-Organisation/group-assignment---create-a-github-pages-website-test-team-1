@@ -540,6 +540,23 @@ jobs:
           fi
           echo "fb-activity2=$(/bin/bash .github/scripts/escape.sh "$message")" >> $GITHUB_ENV
           echo "status-activity2=$(/bin/bash .github/scripts/escape.sh "$status")" >> $GITHUB_ENV
+
+      # activity 3 feedback
+      - name: activity 3 feedback
+        run: |
+          if ${{ needs.grade.outputs.activity3-result == 'success' }}; then
+            message="${{ steps.mto.outputs.activity3-success }}"
+            status="${{ steps.mto.outputs.status-success }}"
+          else
+            message="${{ steps.mto.outputs.activity3-fail }}"
+            status="${{ steps.mto.outputs.status-fail }}"
+
+            IFS=',][' read -ra teamMembers <<< "${{ needs.grade.outputs.no-pr }}"
+            members="$(printf -- "- %s\n" "${teamMembers[@]:1}")"
+            echo "no-pr-members=$(/bin/bash .github/scripts/escape.sh "$members")" >> $GITHUB_ENV
+          fi
+          echo "fb-activity3=$(/bin/bash .github/scripts/escape.sh "$message")" >> $GITHUB_ENV
+          echo "status-activity3=$(/bin/bash .github/scripts/escape.sh "$status")" >> $GITHUB_ENV
       
       # generate formatted list of members who have not made a commit
       - name: list no commit members
