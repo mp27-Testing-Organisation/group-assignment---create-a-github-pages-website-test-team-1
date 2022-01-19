@@ -350,14 +350,86 @@ jobs:
           echo "${{steps.activity4.outputs.result}}"
           echo "${{steps.activity4.outputs.no_comments}}"
 
+      # get merge commit SHAs
+      - name: Get merge commit SHAs
+        id: merge-shas
+        run: |
+          shas=$(git log --branches --merges --pretty='%H')
+          shas=${shas[@]}
+          echo "::set-output name=sha_list::$shas"
 
       # test activity 5 - merge commit
-      # get all merge commits
-      # filter members not author of merge
-        # output
-        # - list members not make merge commit
+      - uses: actions/github-script@v5
+        name: "Check Activity 5"
+        id: activity5
+        env:
+          MEMBERS: ${{ steps.team-members.outputs.result }}
+          MERGE_SHAS: ${{ steps.merge-shas.outputs.sha_list }}
+          BRANCHES: ${{ steps.branch-list.outputs.branch_list }}
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const members = JSON.parse(process.env.MEMBERS);
+            const mergeSHAs = process.env.MERGE_SHAS.split(" ");
+            const branches = process.env.BRANCHES.split(" ");
 
-      
+            let noMergeMembers = [];
+            let result = 'fail';
+
+            // loop through members
+            for (const member of members) {
+              let commitFound = false;
+              // loop through branches
+              for (const branch of branches) {
+                // get commits, filtered by actor and branch
+                const res = await github.rest.repos.listCommits({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  author: member,
+                  sha: branch,
+                  per_page: 100
+                });
+                console.log(`List commits for ${member} on ${branch} response: ${res.status}`);
+
+                const commitSHAs = res.data.map(item => item.sha);
+
+                if (mergeSHAs.some(v => commitSHAs.includes(v))) {
+                  commitFound = true;
+                  break;
+                }
+              }
+
+              if (commitFound) {
+                console.log(`${member} has committed a file`);
+              }
+              else {
+                console.log("No addition commits found");
+                console.log(`${member} has not committed a file`);
+                noMergeMembers.push(member);
+              }
+            }
+
+            // is noMergeMembers list non-zero
+            if (noMergeMembers.length) {
+              console.log("Members found with no commits");
+              result = 'fail';
+            }
+            else {
+              console.log("No members found who have made no commits")
+
+              // write result to file
+              const fs = require('fs');
+              fs.writeFile('.github/results/activity2.txt', 'pass', function (err) {
+                if (err) return console.log(err);
+              });
+
+              result = 'success';
+            }
+            core.setOutput('no_merges', noMergeMembers);
+            return result
+      - run: |
+          echo "${{steps.activity5.outputs.result}}"
+          echo "${{steps.activity5.outputs.no_merges}}"
 
       # run grading
       # add id to step so outputs can be referenced
@@ -379,6 +451,8 @@ jobs:
       no-pr: ${{ steps.activity3.outputs.no_pr }}
       activity4-result: ${{ steps.activity4.outputs.result }}
       no-comments: ${{ steps.activity4.outputs.no_comments }}
+      activity5-result: ${{ steps.activity5.outputs.result }}
+      no-merges: ${{ steps.activity5.outputs.no_merges }}
 
   # job to get repo info: default branch, feedback pr number
   repo-info:
