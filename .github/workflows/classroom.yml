@@ -294,20 +294,22 @@ jobs:
                 }
               });
 
-              for (id of prIDs) {
-                const resPRComments = await github.rest.issues.listComments({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: id,
-                  per_page: 100
-                });
-                console.log(`List PR ${id} comments response: ${resPRComments.status}`);
+              if (prIDs.length) {
+                for (id of prIDs) {
+                  const resPRComments = await github.rest.issues.listComments({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: id,
+                    per_page: 100
+                  });
+                  console.log(`List PR ${id} comments response: ${resPRComments.status}`);
 
-                const commentAuthors = resPRComments.data.map(item => item.user.login);
+                  const commentAuthors = resPRComments.data.map(item => item.user.login);
 
-                if (commentAuthors.includes(member)) {
-                  commentFound = true;
-                  break;
+                  if (commentAuthors.includes(member)) {
+                    commentFound = true;
+                    break;
+                  }
                 }
               }
 
