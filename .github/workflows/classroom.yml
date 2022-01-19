@@ -290,7 +290,7 @@ jobs:
 
               const prIDs = resAllPR.data.map(item => {
                 if (! ["github-classroom[bot]", member].includes(item.user.login)){
-                  return item;
+                  return item.id;
                 }
               });
 
