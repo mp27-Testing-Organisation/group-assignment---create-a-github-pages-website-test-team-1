@@ -166,7 +166,7 @@ jobs:
               // loop through branches
               for (const branch of branches) {
                 // get commits, filtered by actor and branch
-                const res = await github.repos.listCommits({
+                const res = await github.repos.rest.listCommits({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   author: member,
