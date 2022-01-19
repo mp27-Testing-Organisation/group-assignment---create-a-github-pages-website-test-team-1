@@ -289,7 +289,6 @@ jobs:
               let commentFound = false;
 
               const prIDs = resAllPR.data.map(item => {
-                //## if item.user.login != "github-classroom[bot]"
                 if (! ["github-classroom[bot]", member].includes(item.user.login)){
                   return item;
                 }
@@ -306,7 +305,7 @@ jobs:
 
                 const commentAuthors = resPRComments.data.map(item => item.user.login);
 
-                if (commentAuthors.includes(member) {
+                if (commentAuthors.includes(member)) {
                   commentFound = true;
                   break;
                 }
@@ -339,6 +338,9 @@ jobs:
             }
             core.setOutput('no_comments', noCommentMembers);
             return result
+      - run: |
+          echo "${{steps.activity4.outputs.result}}"
+          echo "${{steps.activity4.outputs.no_comments}}"
 
 
       # test activity 5 - merge commit
