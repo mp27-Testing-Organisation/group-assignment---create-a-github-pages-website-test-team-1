@@ -59,6 +59,10 @@ activity4-success: Everyone in the team has commented on someone else's Pull Req
 activity4-fail: |
   Not everyone has reviewed another's Pull Request. The following team members have not reviewed a Pull Request:
   \${no-comment-members}
+activity5-success: Everyone in the team has authored a merge commit.
+activity5-fail: |
+  Not everyone has authored a merge commit. The following team members have not authored a merge commit:
+  \${no-merge-members}
 ---
 
 ## Auto-Feedback
@@ -80,6 +84,10 @@ ${fb-activity3}
 #### ${status-activity4} Activity 4 - Review Pull Request
 
 ${fb-activity4}
+
+#### ${status-activity5} Activity 5 - Merge Commit
+
+${fb-activity5}
 
 ### Team Members
 
