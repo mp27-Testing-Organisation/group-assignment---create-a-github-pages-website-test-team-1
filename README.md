@@ -39,18 +39,18 @@ Your site is available at: [https://mp27-testing-organisation.github.io/group-as
 |:---|
 | Enable pages for this repo. Use the `main` branch and `/docs` folder for site contents. |
 
-| :keyboard: Activity - Make commit |
+| <img alt="activity status" align="right" height="24" src="../../blob/status/.github/activity-icons/activity2.svg" /> :keyboard: Activity - Make commit |
 |:---|
 | Each member in the team must make a commit that adds a new file. |
 
-| :keyboard: Activity - Open Pull Request |
+| <img alt="activity status" align="right" height="24" src="../../blob/status/.github/activity-icons/activity3.svg" /> :keyboard: Activity - Open Pull Request |
 |:---|
 | Each member in the team must open a pull request. |
 
-| :keyboard: Activity - Review Pull Request |
+| <img alt="activity status" align="right" height="24" src="../../blob/status/.github/activity-icons/activity4.svg" /> :keyboard: Activity - Review Pull Request |
 |:---|
 | Each member in the team must comment on someone else's pull request. |
 
-| :keyboard: Activity - Merge Commit |
+| <img alt="activity status" align="right" height="24" src="../../blob/status/.github/activity-icons/activity5.svg" /> :keyboard: Activity - Merge Commit |
 |:---|
 | Each member in the team must author a merge commit. |
