@@ -15,7 +15,7 @@ activity1-fail-2: |
 activity2-success: Yay. Everyone in the team has added a file and made a commit.
 activity2-fail: |
   Not everyone has made a commit. The following team members have not added a file and made a commit:
-  \\${no-commit-members}
+  \${no-commit-members}
   
   <details>
     <summary>How to make a git commit</summary>
