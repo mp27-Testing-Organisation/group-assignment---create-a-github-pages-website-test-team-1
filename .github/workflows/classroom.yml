@@ -141,6 +141,10 @@ jobs:
           branches=${branches[@]//feedback/}
           echo "::set-output name=branch_list::$branches"
 
+      - run: |
+          echo "${{steps.commit-shas.outputs.sha_list}}"
+          echo "${{ steps.branch-list.outputs.branch_list }}"
+
       # test activity 2 - commits
       - uses: actions/github-script@v5
         name: "Check Activity 2"
