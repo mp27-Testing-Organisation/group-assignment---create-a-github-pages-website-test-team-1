@@ -294,6 +294,8 @@ jobs:
                 }
               });
 
+              console.log(prIDs);
+
               if (prIDs.length) {
                 for (id of prIDs) {
                   const resPRComments = await github.rest.issues.listComments({
