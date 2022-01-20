@@ -902,6 +902,7 @@ jobs:
 
             stats = Object.assign({}, ...commitCount.map(element => {
                 e = element.trim().split(/(?<=^\S+)\s/);
+                // if (ignoreAuthors.includes(e[1])) continue;
                 return ({[e[1]]: {'commits': e[0]}});
                 })
             );
@@ -942,7 +943,7 @@ jobs:
             for (item in stats) {
                 // get last commit SHA
                 lastSHA = cp
-                .execSync(`git log -1 --author="${item}" --pretty=format:"%H"`)
+                .execSync(`git log -1 --all --author="${item}" --pretty=format:"%H"`)
                 .toString()
                 .trim()
                 console.log(lastSHA);
