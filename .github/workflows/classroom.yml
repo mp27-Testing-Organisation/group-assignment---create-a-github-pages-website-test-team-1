@@ -834,20 +834,31 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
+          cache: 'npm'
+      - run: npm install -g git-hours
 
       # try git-hours
       - name: git hours
-        run: |
-          npm install -g git-hours
-          git-hours
+        run: git-hours
 
-      - name: Git hours
-        uses: denstorti/git-hours-action@v1
-        id: githours
-      - run: echo -e '${{steps.githours.outputs.hours}}' 
+      # - name: Git hours
+      #   uses: denstorti/git-hours-action@v1
+      #   id: githours
+      # - run: echo -e '${{steps.githours.outputs.hours}}' 
 
       - name: Lines per contrib
         run: git ls-files | xargs -n1 git blame --line-porcelain | sed -n 's/^author //p' | sort -f | uniq -ic | sort -nr
 
       - name: Commit count
         run: git log --pretty='%an %ae' | sort -f | uniq -ic | sort -nr
+
+      - uses: actions/github-script@v5
+        name: "search queries"
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            q = `repo:${process.env.GITHUB_REPOSITORY} author: 'markpatterson27'`
+            const res = await github.rest.search.issuesAndPullRequests({
+              q: q,
+            })
+            console.log(res)
