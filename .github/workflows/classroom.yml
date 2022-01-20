@@ -826,66 +826,32 @@ jobs:
               body: `${MESSAGE}`
             })
   
+  # job to get repo info: default branch, feedback pr number
   repo-stats:
-    name: Try getting repo stats
+    name: Get Repo Stats
     runs-on: ubuntu-latest
+    # run even if autograding fails. only run on main branch and if pr exists.
+    if: ${{ always() && github.ref == 'refs/heads/main' && github.actor != 'github-classroom[bot]' }}
     steps:
+      # checkout files so can access template
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-      - run: npm install -g git-hours
 
-      # try git-hours
-      - name: git hours
-        run: git-hours
-
-      # - name: Git hours
-      #   uses: denstorti/git-hours-action@v1
-      #   id: githours
-      # - run: echo -e '${{steps.githours.outputs.hours}}' 
-
-      - name: Lines per contrib
-        run: git ls-files | xargs -n1 git blame --line-porcelain | sed -n 's/^author //p' | sort -f | uniq -ic | sort -nr
-
-      - name: Commit count
-        run: git log --pretty='%an %ae' | sort -f | uniq -ic | sort -nr
+      # # install git-hours
+      # # installing currently takes too long. TODO: find quicker option
+      # - uses: actions/setup-node@v2
+      #   with:
+      #     node-version: '14'
+      # - run: npm install -g git-hours
 
       - uses: actions/github-script@v5
-        name: "search queries"
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            // q = `repo%3A{process.env.GITHUB_REPOSITORY}%2Fauthor%3Amarkpatterson27%2Ftype%3Apr`
-            // const res = await github.rest.search.issuesAndPullRequests({
-            //   q: q,
-            // })
-            // console.log(res)
-
-            const resComments = await github.rest.issues.listCommentsForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-            })
-            console.log(resComments)
-
-            console.log()
-
-            const resIssues = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-            })
-            console.log(resIssues)
-
-      - uses: actions/github-script@v5
-        name: "test user login retreval"
+        name: "Get repo user stats"
+        id: user-stats
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             const cp = require('child_process');
-
-            const members = ['obstikle', 'markpatterson27'];
 
             // commit authors to ignore
             const ignoreAuthors = [
@@ -899,24 +865,23 @@ jobs:
             .execSync("git shortlog -s -n --all --no-merges")
             .toString()
             .trim()
-            .split(/\r?\n/)
-            console.log(commitCount);
+            .split(/\r?\n/);
+            //console.log(commitCount);
 
             stats = Object.assign({}, ...commitCount.map(element => {
                 e = element.trim().split(/(?<=^\S+)\s/);
-                // if (ignoreAuthors.includes(e[1])) continue;
-                return ({[e[1]]: {'commits': e[0]}});
+                if (!ignoreAuthors.includes(e[1])) return ({[e[1]]: {'commits': e[0]}});
                 })
             );
-            console.log(stats);
+            //console.log(stats);
 
             // get lines
             lineCount = cp
             .execSync("git ls-files | xargs -n1 git blame --line-porcelain | sed -n 's/^author //p' | sort -f | uniq -ic")
             .toString()
             .trim()
-            .split(/\r?\n/)
-            console.log(lineCount);
+            .split(/\r?\n/);
+            //console.log(lineCount);
 
             // merge lines into stats
             for (item of lineCount) {
@@ -924,22 +889,22 @@ jobs:
                 if (ignoreAuthors.includes(e[1])) continue;
                 stats[e[1]]['linecount'] = e[0]
             }
-            console.log(stats);
+            console.log(`Commit and line stats: ${stats}`);
 
-            // get hours
-            hours = cp
-            .execSync("git-hours")
-            .toString()
-            .trim()
-            hours = JSON.parse(hours);
-            console.log(hours);
+            // // get hours
+            // hours = cp
+            // .execSync("git-hours")
+            // .toString()
+            // .trim();
+            // hours = JSON.parse(hours);
+            // console.log(hours);
 
-            // merge hours into stats
-            for (item in hours) {
-                if (item == 'total') continue;
-                stats[hours[item].name]['hours'] = hours[item].hours
-            }
-            console.log(stats);
+            // // merge hours into stats
+            // for (item in hours) {
+            //     if (item == 'total') continue;
+            //     stats[hours[item].name]['hours'] = hours[item].hours
+            // }
+            // console.log(stats);
 
             // get GitHub username
             for (item in stats) {
@@ -948,24 +913,23 @@ jobs:
                 .execSync(`git log -1 --all --author="${item}" --pretty=format:"%H"`)
                 .toString()
                 .trim()
-                console.log(lastSHA);
+                //console.log(lastSHA);
 
                 if (lastSHA.length) {
-
-                // get commit from GitHub
-                const res = await github.rest.repos.getCommit({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    ref: lastSHA,
-                });
-                console.log(res.data.author.login);
-
-                stats[item]['username'] = res.data.author.login;
+                  // get commit from GitHub
+                  const res = await github.rest.repos.getCommit({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      ref: lastSHA,
+                  });
+                  console.log(`Get commit response: ${res.status}`);
+                  //console.log(res.data.author.login);
+                  stats[item]['username'] = res.data.author.login;
                 }
             }
-            console.log("*** End Stats ***")
-            console.log(stats);
+            //console.log(stats);
 
+            // map stats to GH usernames
             const userStats = Object.keys(stats).reduce((r,a) => {
               e = stats[a];
               r[e.username] = r[e.username] || {};
@@ -977,4 +941,9 @@ jobs:
               }
               return r;
             }, {});
-            console.log(userStats);
+            console.log(`User stats: ${userStats}`);
+            return userStats;
+      - run: echo "${{ steps.user-stats.outputs.result }}"
+
+    outputs:
+      user-stats: ${{ steps.user-stats.outputs.result }}
