@@ -896,7 +896,7 @@ jobs:
             const res = await github.rest.repos.getCommit({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              commit_sha: lastSHA,
+              ref: lastSHA,
             });
 
             console.log(res.data);
