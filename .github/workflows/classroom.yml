@@ -806,9 +806,9 @@ jobs:
 
             let tableBody = "";
             for (const e in memberStats){
-              const commits = ${memberStats[e].commits};
+              const commits = memberStats[e].commits;
               const commitsP = (memberStats[e].commits*100/totals.commits).toFixed(2);
-              const lines = ${memberStats[e].linecount};
+              const lines = memberStats[e].linecount;
               const linesP = (memberStats[e].linecount*100/totals.linecount).toFixed(2);
               const overall = (memberStats[e].overall*100/totals.overall).toFixed(2);
 
