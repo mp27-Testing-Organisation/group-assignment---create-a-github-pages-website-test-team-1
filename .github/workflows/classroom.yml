@@ -832,7 +832,7 @@ jobs:
           pages-path: ${{ needs.grade.outputs.pages-path }}
           points: ${{ needs.grade.outputs.grading-score }}
           template: ${{ steps.mto.outputs.body }}
-          team-stats: ${{ steps.member-stats.outputs.output }}
+          team-stats: ${{ steps.member-stats.outputs.result }}
         with:
           script: |
             const fs = require('fs')
