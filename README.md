@@ -54,3 +54,5 @@ Your site is available at: [https://mp27-testing-organisation.github.io/group-as
 | <img alt="activity status" align="right" height="24" src="../../blob/status/.github/activity-icons/activity5.svg" /> :keyboard: Activity - Merge Commit |
 |:---|
 | Each member in the team must author a merge commit. |
+
+I think this should be changed
