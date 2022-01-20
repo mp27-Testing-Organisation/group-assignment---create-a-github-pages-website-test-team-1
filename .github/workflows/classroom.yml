@@ -814,6 +814,7 @@ jobs:
 
               tableBody += `| ${e} | ${commits} | ${commitsP}% | ${lines} | ${linesP}% | ${overall}% |\n`;
             }
+            console.log(tableBody);
             return tableBody
               .replace('\%', /%25/g)
               .replace('\r', /%0D/g)
@@ -831,7 +832,7 @@ jobs:
           pages-path: ${{ needs.grade.outputs.pages-path }}
           points: ${{ needs.grade.outputs.grading-score }}
           template: ${{ steps.mto.outputs.body }}
-          team-stats: ${{ steps.mto.outputs.output }}
+          team-stats: ${{ steps.member-stats.outputs.output }}
         with:
           script: |
             const fs = require('fs')
