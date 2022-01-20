@@ -834,7 +834,6 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
-          cache: 'npm'
       - run: npm install -g git-hours
 
       # try git-hours
