@@ -816,9 +816,9 @@ jobs:
             }
             console.log(tableBody);
             return tableBody
-              .replace('\%', /%25/g)
-              .replace('\r', /%0D/g)
-              .replace('\n', /%0A/g);
+            //  .replace('\%', /%25/g)
+            // .replace('\r', /%0D/g)
+            // .replace('\n', /%0A/g);
           result-encoding: string
 
       # replace tokens
