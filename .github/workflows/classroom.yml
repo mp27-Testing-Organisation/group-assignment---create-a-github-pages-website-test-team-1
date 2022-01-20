@@ -856,7 +856,7 @@ jobs:
         with:
           github-token: ${{secrets.READORG}}
           script: |
-            q = `repo%3A{process.env.GITHUB_REPOSITORY}%2Fauthor%3Amarkpatterson27`
+            q = `repo%3A{process.env.GITHUB_REPOSITORY}%2Fauthor%3Amarkpatterson27%2Ftype%3Apr`
             const res = await github.rest.search.issuesAndPullRequests({
               q: q,
             })
