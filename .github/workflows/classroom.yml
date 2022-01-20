@@ -857,7 +857,7 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            q = `repo:${process.env.GITHUB_REPOSITORY} author: 'markpatterson27'`
+            q = `repo:${process.env.GITHUB_REPOSITORY} author:'markpatterson27'`
             const res = await github.rest.search.issuesAndPullRequests({
               q: q,
             })
