@@ -877,3 +877,26 @@ jobs:
               repo: context.repo.repo,
             })
             console.log(resIssues)
+
+      - uses: actions/github-script@v5
+        name: "test user login retreval"
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const cp = require('child_process');
+
+            const item = 'Mark Patterson';
+            // get last commit SHA
+            lastSHA = cp
+            .execSync(`git log -1 --author="${item}" --pretty=format:"%H"`)
+            .toString()
+            .trim()
+            console.log(lastSHA);
+
+            const res = await github.rest.repos.commits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: lastSHA,
+            });
+
+            console.log(res.data[0].author.login);
