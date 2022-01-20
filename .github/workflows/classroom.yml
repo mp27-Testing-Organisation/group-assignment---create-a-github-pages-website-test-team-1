@@ -854,10 +854,24 @@ jobs:
       - uses: actions/github-script@v5
         name: "search queries"
         with:
-          github-token: ${{secrets.READORG}}
+          github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            q = `repo%3A{process.env.GITHUB_REPOSITORY}%2Fauthor%3Amarkpatterson27%2Ftype%3Apr`
-            const res = await github.rest.search.issuesAndPullRequests({
-              q: q,
+            // q = `repo%3A{process.env.GITHUB_REPOSITORY}%2Fauthor%3Amarkpatterson27%2Ftype%3Apr`
+            // const res = await github.rest.search.issuesAndPullRequests({
+            //   q: q,
+            // })
+            // console.log(res)
+
+            const resComments = await github.rest.issues.listCommentsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
             })
-            console.log(res)
+            console.log(resComments)
+
+            console.log()
+
+            const resIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            })
+            console.log(resIssues)
