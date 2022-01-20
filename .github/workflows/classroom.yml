@@ -899,4 +899,4 @@ jobs:
               commit_sha: lastSHA,
             });
 
-            console.log(res.data[0].author.login);
+            console.log(res.data);
