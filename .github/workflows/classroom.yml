@@ -770,7 +770,6 @@ jobs:
 
       # generate team member stats
       - name: generate member stats
-        id: prep
         uses: actions/github-script@v5
         env:
           MEMBERS: ${{ needs.grade.outputs.team-members }}
