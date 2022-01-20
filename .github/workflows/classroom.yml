@@ -770,6 +770,7 @@ jobs:
 
       # generate team member stats
       - name: generate member stats
+        id: member-stats
         uses: actions/github-script@v5
         env:
           MEMBERS: ${{ needs.grade.outputs.team-members }}
@@ -779,8 +780,45 @@ jobs:
             const members = JSON.parse(process.env.MEMBERS);
             const userStats = JSON.parse(process.env.USERSTATS);
 
-            console.log(members);
-            console.log(userStats);
+            let memberStats = {};
+            for (const member of members) {
+              memberStats[member] = {};
+              memberStats[member]['commits'] = (userStats[member]) ? userStats[member].commits : 0;
+              memberStats[member]['linecount'] = (userStats[member]) ? userStats[member].linecount : 0;
+            }
+            console.log(memberStats);
+
+            // calc overall geomean
+            for (const k in memberStats){
+              const overall = Math.sqrt(memberStats[k].commits * memberStats[k].linecount / 10);
+              memberStats[k]['overall'] = overall;
+            }
+
+            // calc totals
+            const totals = Object.keys(memberStats).reduce((r,a) => {
+              e = memberStats[a];
+              for (k in e) {
+                r[k] = (r[k]) ? r[k] + e[k] : e[k];
+              }
+              return r;
+            }, {});
+            console.log(totals);
+
+            let tableBody = "";
+            for (const e in memberStats){
+              const commits = ${memberStats[e].commits};
+              const commitsP = (memberStats[e].commits*100/totals.commits).toFixed(2);
+              const lines = ${memberStats[e].linecount};
+              const linesP = (memberStats[e].linecount*100/totals.linecount).toFixed(2);
+              const overall = (memberStats[e].overall*100/totals.overall).toFixed(2);
+
+              tableBody += `| ${e} | ${commits} | ${commitsP}% | ${lines} | ${linesP}% | ${overall}% |\n`;
+            }
+            return tableBody
+              .replace('\%', /%25/g)
+              .replace('\r', /%0D/g)
+              .replace('\n', /%0A/g);
+          result-encoding: string
 
       # replace tokens
       # read template file and replace tokens. token replacement based on env name.
@@ -793,6 +831,7 @@ jobs:
           pages-path: ${{ needs.grade.outputs.pages-path }}
           points: ${{ needs.grade.outputs.grading-score }}
           template: ${{ steps.mto.outputs.body }}
+          team-stats: ${{ steps.mto.outputs.output }}
         with:
           script: |
             const fs = require('fs')

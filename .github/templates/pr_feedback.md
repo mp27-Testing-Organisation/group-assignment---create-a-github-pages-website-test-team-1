@@ -95,4 +95,15 @@ ${team-members}
 
 #### Contribution Stats
 
+| Member | Commits | % Commits | Lines | % Lines | Overall |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+${team-stats}
+
+<details>
+    <summary>details</summary>
+
+    svg image?
+
+</details>
+
 Autograding Score: ${points}
