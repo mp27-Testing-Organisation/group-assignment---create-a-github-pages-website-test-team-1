@@ -965,3 +965,16 @@ jobs:
             }
             console.log("*** End Stats ***")
             console.log(stats);
+
+            const userStats = Object.keys(stats).reduce((r,a) => {
+              e = stats[a];
+              r[e.username] = r[e.username] || {};
+
+              for (k in e) {
+                if (k == 'username') continue;
+                // console.log(k)
+                r[e.username][k] = (r[e.username][k]) ? r[e.username][k] + parseInt(e[k]) : parseInt(e[k]);
+              }
+              return r;
+            }, {});
+            console.log(userStats);
