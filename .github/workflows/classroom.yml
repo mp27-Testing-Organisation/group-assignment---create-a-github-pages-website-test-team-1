@@ -893,7 +893,7 @@ jobs:
             .trim()
             console.log(lastSHA);
 
-            const res = await github.rest.repos.listCommentsForCommit({
+            const res = await github.rest.repos.getCommit({
               owner: context.repo.owner,
               repo: context.repo.repo,
               commit_sha: lastSHA,
