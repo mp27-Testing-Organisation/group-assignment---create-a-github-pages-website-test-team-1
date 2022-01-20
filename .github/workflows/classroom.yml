@@ -650,7 +650,7 @@ jobs:
     runs-on: ubuntu-latest
     # run even if autograding fails. only run on main branch and if pr exists.
     if: ${{ always() && needs.repo-info.outputs.feedback-pr != '' && github.ref == 'refs/heads/main' && github.actor != 'github-classroom[bot]' }}
-    needs: [grade, repo-info]
+    needs: [grade, repo-info, repo-stats]
     steps:
       # checkout files so can access template
       - uses: actions/checkout@v2
@@ -767,6 +767,21 @@ jobs:
           done
           # members="$(printf -- "- %s\n" "${teamMembers[@]:1}")"
           echo "team-members=$(/bin/bash .github/scripts/escape.sh "$members")" >> $GITHUB_ENV
+
+      # generate team member stats
+      - name: generate member stats
+        id: prep
+        uses: actions/github-script@v5
+        env:
+          MEMBERS: ${{ needs.grade.outputs.team-members }}
+          USERSTATS: ${{ needs.repo-stats.outputs.user-stats }}
+        with:
+          script: |
+            const members = JSON.parse(process.env.MEMBERS);
+            const userStats = JSON.parse(process.env.USERSTATS);
+
+            console.log(members);
+            console.log(userStats);
 
       # replace tokens
       # read template file and replace tokens. token replacement based on env name.
