@@ -833,14 +833,14 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      # - uses: actions/setup-node@v2
-      #   with:
-      #     node-version: '14'
-      # - run: npm install -g git-hours
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - run: npm install -g git-hours
 
-      # # try git-hours
-      # - name: git hours
-      #   run: git-hours
+      # try git-hours
+      - name: git hours
+        run: git-hours
 
       # - name: Git hours
       #   uses: denstorti/git-hours-action@v1
@@ -885,18 +885,77 @@ jobs:
           script: |
             const cp = require('child_process');
 
-            const item = 'Mark Patterson';
-            // get last commit SHA
-            lastSHA = cp
-            .execSync(`git log -1 --author="${item}" --pretty=format:"%H"`)
+            // commit authors to ignore
+            const ignoreAuthors = [
+                'GitHub Action',
+                'github-classroom[bot]',
+                'Not Committed Yet'
+            ];
+
+            // get commits
+            commitCount = cp
+            .execSync("git shortlog -s -n --all --no-merges")
             .toString()
             .trim()
-            console.log(lastSHA);
+            .split(/\r?\n/)
+            console.log(commitCount);
 
-            const res = await github.rest.repos.getCommit({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: lastSHA,
-            });
+            stats = Object.assign({}, ...commitCount.map(element => {
+                e = element.trim().split(/(?<=^\S+)\s/);
+                return ({[e[1]]: {'commits': e[0]}});
+                })
+            );
+            console.log(stats);
 
-            console.log(res.data.author.login);
+            // get lines
+            lineCount = cp
+            .execSync("git ls-files | xargs -n1 git blame --line-porcelain | sed -n 's/^author //p' | sort -f | uniq -ic")
+            .toString()
+            .trim()
+            .split(/\r?\n/)
+            console.log(lineCount);
+
+            // merge lines into stats
+            for (item of lineCount) {
+                e = item.trim().split(/(?<=^\S+)\s/);
+                if (ignoreAuthors.includes(e[1])) continue;
+                stats[e[1]]['linecount'] = e[0]
+            }
+            console.log(stats);
+
+            // get hours
+            hours = cp
+            .execSync("git-hours")
+            .toString()
+            .trim()
+            hours = JSON.parse(hours);
+            console.log(hours);
+
+            // merge hours into stats
+            for (item in hours) {
+                if (item == 'total') continue;
+                stats[hours[item].name]['hours'] = hours[item].hours
+            }
+            console.log(stats);
+
+            // get GitHub username
+            for (item in stats) {
+                // get last commit SHA
+                lastSHA = cp
+                .execSync(`git log -1 --author="${item}" --pretty=format:"%H"`)
+                .toString()
+                .trim()
+                console.log(lastSHA);
+
+                // get commit from GitHub
+                const res = await github.rest.repos.getCommit({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    ref: lastSHA,
+                });
+                console.log(res.data.author.login);
+
+                stats[item]['username'] = res.data.author.login;
+            }
+            console.log("*** End Stats ***")
+            console.log(stats);
