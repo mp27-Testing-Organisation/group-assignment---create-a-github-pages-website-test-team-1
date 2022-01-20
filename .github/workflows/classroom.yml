@@ -885,6 +885,8 @@ jobs:
           script: |
             const cp = require('child_process');
 
+            const members = ['obstikle', 'markpatterson27'];
+
             // commit authors to ignore
             const ignoreAuthors = [
                 'GitHub Action',
@@ -948,6 +950,8 @@ jobs:
                 .trim()
                 console.log(lastSHA);
 
+                if (lastSHA.length) {
+
                 // get commit from GitHub
                 const res = await github.rest.repos.getCommit({
                     owner: context.repo.owner,
@@ -957,6 +961,7 @@ jobs:
                 console.log(res.data.author.login);
 
                 stats[item]['username'] = res.data.author.login;
+                }
             }
             console.log("*** End Stats ***")
             console.log(stats);
