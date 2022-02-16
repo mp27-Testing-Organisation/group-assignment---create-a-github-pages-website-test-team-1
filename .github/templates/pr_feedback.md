@@ -15,6 +15,7 @@ activity1-fail-2: |
 activity2-success: Yay. Everyone in the team has added a file and made a commit.
 activity2-fail: |
   Not everyone has made a commit. The following team members have not added a file and made a commit:
+  
   \${no-commit-members}
   
   <details>
@@ -54,14 +55,17 @@ activity2-fail: |
 activity3-success: Yay. Everyone in the team has opened a Pull Request.
 activity3-fail: |
   Not everyone has opened a Pull Request. The following team members have not opened a Pull Request:
+
   \${no-pr-members}
 activity4-success: Everyone in the team has commented on someone else's Pull Request.
 activity4-fail: |
   Not everyone has reviewed another's Pull Request. The following team members have not reviewed a Pull Request:
+
   \${no-comment-members}
 activity5-success: Everyone in the team has authored a merge commit.
 activity5-fail: |
   Not everyone has authored a merge commit. The following team members have not authored a merge commit:
+
   \${no-merge-members}
 ---
 
