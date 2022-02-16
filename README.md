@@ -29,7 +29,7 @@ The site should have common navigation, header and footer on all pages. Consiste
 
 You will need to [enable GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site) for this repo. You are to use the `main` branch and `/docs` folder for site contents.
 
-Your site is available at: [https://markpatterson27.github.io/Group-Assignment-Create-A-GitHub-Pages-Website-dev/](https://markpatterson27.github.io/Group-Assignment-Create-A-GitHub-Pages-Website-dev/)
+Your site is available at: [https://mp27-testing-organisation.github.io/group-assignment---create-a-github-pages-website-test-team-1/](https://mp27-testing-organisation.github.io/group-assignment---create-a-github-pages-website-test-team-1/)
 
 ## Tasks
 
@@ -39,18 +39,18 @@ Your site is available at: [https://markpatterson27.github.io/Group-Assignment-C
 |:---|
 | Enable pages for this repo. Use the `main` branch and `/docs` folder for site contents. |
 
-| :keyboard: Activity - Make commit |
+| <img alt="activity status" align="right" height="24" src="../../blob/status/.github/activity-icons/activity2.svg" /> :keyboard: Activity - Make commit |
 |:---|
 | Each member in the team must make a commit that adds a new file. |
 
-| :keyboard: Activity - Open Pull Request |
+| <img alt="activity status" align="right" height="24" src="../../blob/status/.github/activity-icons/activity3.svg" /> :keyboard: Activity - Open Pull Request |
 |:---|
 | Each member in the team must open a pull request. |
 
-| :keyboard: Activity - Review Pull Request |
+| <img alt="activity status" align="right" height="24" src="../../blob/status/.github/activity-icons/activity4.svg" /> :keyboard: Activity - Review Pull Request |
 |:---|
 | Each member in the team must comment on someone else's pull request. |
 
-| :keyboard: Activity - Merge Commit |
+| <img alt="activity status" align="right" height="24" src="../../blob/status/.github/activity-icons/activity5.svg" /> :keyboard: Activity - Merge Commit |
 |:---|
 | Each member in the team must author a merge commit. |
